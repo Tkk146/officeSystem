@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加权限</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="media/layui/css/layui.css" media="all">
+    <script src="media/js/jquery.min.js"></script>
+    <script src="media/layui/layui.js"></script>
+</head>
+<body>
+    <form id="fm1" class="layui-form " >
+        <div class="layui-form-item"  >
+            <label class="layui-form-label">名称：</label>
+            <div class="layui-input-inline">
+                <input name="title" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item"  >
+            <label class="layui-form-label">图标：</label>
+            <div class="layui-input-inline">
+                <input name="aicon" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" >
+            <label class="layui-form-label">路径：</label>
+            <div class="layui-input-inline">
+                <input name="aurl" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" >
+            <label class="layui-form-label">级别：</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="pid" value="0" lay-filter="level"  title="一级" checked>
+                <input type="radio" name="pid" value="-1" lay-filter="level"   title="二级" >
+            </div>
+        </div>
+        <input type="hidden" name="parentId" id="pid">
+        <div class="layui-form-item" id="dvl1" style="display: none" >
+            <label class="layui-form-label">上级路径：</label>
+            <div class="layui-input-block  layui-form" lay-filter="selFilter">
+                <select id="spid" name="spid" ></select>
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="frm1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+<script>
+    layui.use('form', function(){
+        var form = layui.form;
+        //ajax查询数据库 查询所有角色追加到下拉框里面  注意最后面加一句  form.render() 重新渲染表格。
+        $.ajax({
+            url:'/office/queryAllAuthority.do',
+            type:'post',
+            dataType:'json',
+            data:{},
+            cache:false,
+            success: function (data) {
+                var opt = "<option value='' selected = \'selected\'>全部</option>";
+                $("select[name=spid]").append(opt);
+                for(var i=0; i<data.length; i++){
+                    var option="<option";
+                    option += ">"+data[i].title+"</option>"; //动态添加数据
+                    $("select[name=spid]").append(option);
+                }
+                layui.form.render('select','selFilter');
+            }
+        });
+
+     form.on('radio(level)',function (obj) {
+         if(obj.value==-1){//选择了二级菜单
+             $("#dvl1").show();
+         }
+         else if(obj.value==0){
+             $("#dvl1").hide();
+         }
+     })
+    });
+
+</script>
+    <script>
+        //参考layui的表单
+        layui.use(['form','layer'], function(){
+            var form = layui.form;
+            var layer=layui.layer;
+
+            form.on('submit(frm1)', function(data){
+                //ajax提交表单 添加用户
+                $.ajax({
+                    url:'/office/authorityAdd.do',
+                    data:$("#test").serialize(),//表单序列化，可以快速地获取表单的全部属性值
+                    type:'post',
+                    success:function (obj) {
+                        if(obj.code==0){
+                            layer.msg('添加成功',{icon:6});
+                            window.parent.location.href='resourcelimit.html';
+                        }
+
+                    }
+                });
+                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+        });
+    </script>
+</body>
+</html>

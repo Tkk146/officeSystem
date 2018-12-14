@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oa.mapper.AuthorityMapper">
+    <resultMap id="AuthorityMap" type="com.oa.model.Authority">
+        <id property="id" column="id"/>
+        <result property="aicon" column="aicon"/>
+        <result property="aurl" column="aurl"/>
+        <result property="parentId" column="parentId"/>
+        <result property="title" column="title"/>
+        <result property="type" column="type"/>
+    </resultMap>
+    <!--查询所有权限进行分页-->
+    <select id="queryAuthorityPage" resultMap="AuthorityMap">
+        select  * from  t_authority
+        <where>
+            <if test="title!=null and title!=''"> and title like "%"#{title}"%" </if>
+        </where>
+        limit #{begin},#{limit}
+    </select>
+    <!--查询个数-->
+    <select id="queryCount" resultType="long">
+        select count(*) from t_authority
+    </select>
+    <!--根据id删除-->
+    <delete id="deleteAuthorityById" parameterType="int">
+        delete  from t_authority  where id=#{id}
+    </delete>
+    <!--根据id删除角色权限-->
+    <delete id="deleteRoleAuthority" parameterType="int">
+        delete  from t_roleauthority where rid=#{id}
+    </delete>
+    <!--修改权限-->
+    <update id="updateAuthority" parameterType="authority">
+       update  t_authority
+       <set>
+           <if test="aicon!=null and aicon!=''"> aicon=#{aicon},</if>
+           <if test="aurl!=null and aurl!=''">aurl=#{aurl},</if>
+           <if test="title!=null and title!=''">title=#{title},</if>
+           <if test="parentId!=null">parentId=#{parentId},</if>
+           <if test="type!=null">type=#{type},</if>
+       </set>
+        where id=#{id}
+    </update>
+    <!--根据id查询权限-->
+    <select id="selectAuthorityById" parameterType="int" resultMap="AuthorityMap">
+        select * from t_authority where id=#{id}
+    </select>
+    <select id="selectAllAuthority" resultMap="AuthorityMap">
+        select  * from  t_authority
+    </select>
+</mapper>
